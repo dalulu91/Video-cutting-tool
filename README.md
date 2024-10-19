@@ -15,11 +15,9 @@ Requirement: ffmpeg
 6. Click Export and save your new video.
 
 ## How does it work?
-It runs ffmepg in shell, so make sure ffmpeg is added to your PATH as an enviornment variable.
-This is the shell command:
+Video processing is done with ffmepg, so make sure ffmpeg is added to your PATH.
+This is the ffmpeg command:
 
-`ffmpeg -ss hh:mm:ss -t hh:mm:ss -i input.mp4 -c copy output.mp4`
+`ffmpeg -ss hh:mm:ss -i input.mp4 -t hh:mm:ss -c copy output.mp4`
 
-`-ss` sets position. `-t` sets duration. `-i` sets input. `-c` sets codec.
-
-As I'm writing this and reading the documenation, the `-to` would be better to use than `-t`, since that's exactly what this app is doing: Set in pos and out pos. I didn't know that as I wrote the code, so the duration is calculated based on the out position set in the UI.
+`-ss` sets position. `-i` sets input. `-t` sets duration. `-c` sets codec.

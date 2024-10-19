@@ -193,7 +193,7 @@ class ListFrame(tk.Frame):
         self.listbox.pack(fill="x", expand=True, padx=15, pady=15)
 
         """ Updates entries in listbox from exports.log """
-        for export in exports:
+        for export in exports.reverse():
             self.listbox.insert("0", export)
 
         """ MENU """
