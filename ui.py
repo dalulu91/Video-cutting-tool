@@ -1,6 +1,8 @@
 import tkinter as tk
 import customtkinter as ctk
 import utils
+import os
+import subprocess
 
 
 class Window(ctk.CTk):
@@ -11,7 +13,7 @@ class Window(ctk.CTk):
 
         """ Configure main window """
         self.minsize(555, 273)
-        self.maxsize(3000, 273)
+        # self.maxsize(3000, 700)
         self.config(background=style.BGCOLOR)
         self.title("Video Cutter")
 
@@ -26,11 +28,18 @@ class Window(ctk.CTk):
         """ Pack instances """
         self.headFrame.pack(fill="x", expand=True,
                             anchor="sw", padx=35, pady=15)
+
+        self.info = ctk.CTkLabel(self)
+        self.info.configure(text="Duration:\n00:00:00")
+        self.info.configure(bg_color=style.BGCOLOR)
+        self.info.configure(text_color="#988FA2")
+        self.info.pack(anchor="n", pady=(0, 5))
+
         self.sliderFrame.pack(fill="both", expand=True, anchor="n", padx=15)
         self.timecodeFrame.pack(fill="both", expand=True, anchor="n", padx=15)
         # self.settings.pack(fill="x", expand=True, padx=15)
         self.exportFrame.pack(fill="x", expand=True)
-        # self.listframe.pack(fill="x", expand=True)
+        self.listframe.pack(fill="x", expand=True)
 
 
 class HeadFrame(tk.Frame):
@@ -50,7 +59,8 @@ class HeadFrame(tk.Frame):
 
         """ File path Label """
         self.filepathLabel = ctk.CTkLabel(self)
-        self.filepathLabel.configure(self, text="No files opened yet")
+        self.filepathLabel.configure(text="No files opened yet")
+        self.filepathLabel.configure(wraplength=400)
         self.filepathLabel.configure(font=(style.FONT, 14, "italic"))
         self.filepathLabel.pack(side=ctk.LEFT, anchor="nw", pady=5)
 
@@ -162,26 +172,77 @@ class ListFrame(tk.Frame):
         super().__init__()
         style = Style()
 
+        # TODO: Inserting elements should be done from controller.py
+        if os.path.isfile("exports.log"):
+            with open("exports.log", "r+") as file:
+                exports = file.readlines()
+        else:
+            exports = ["None"]
+        height = 5 if len(exports) >= 5 else 1
+
         self.configure(bg=style.BGCOLOR)
-        listbox = tk.Listbox(
+        self.listbox = tk.Listbox(
             self,
             background=style.BGCOLOR,
             foreground=style.BTNCOLOR,
-            font=(style.FONT, 12, "normal"),
+            font=(style.FONT, 10, "normal"),
+            height=height,
+            width=100,
         )
 
-        listbox.pack(fill="x", expand=True, padx=15, pady=15)
+        self.listbox.pack(fill="x", expand=True, padx=15, pady=15)
 
-        exports = []
-        with open("exports.log", "r") as file:
-            exports.append(file.readlines())
-
+        """ Updates entries in listbox from exports.log """
         for export in exports:
-            listbox.insert(tk.END, export)
+            self.listbox.insert("0", export)
 
-        listbox.insert(tk.END, "First element")
-        listbox.insert(tk.END, "First element")
-        listbox.insert(tk.END, "First element")
+        """ MENU """
+        self.m = tk.Menu(self, tearoff=0)
+        self.m.configure(bg=style.BGCOLOR, fg="#dedede")
+        self.m.add_command(label="Open file", command=self.open_file)
+        self.m.add_command(label="Open folder", command=self.open_folder)
+        # self.m.add_command(label="Remove from list", command=self.delete_item)
+        self.m.add_command(label="Edit list", command=self.edit_list)
+
+        self.listbox.bind("<Button-3>", self.fileMenu)
+        self.listbox.bind("<Double-1>", self.open_file, add="+")
+
+    def fileMenu(self, event):
+        index = self.listbox.nearest(event.y)
+        self.listbox.selection_clear(0, tk.END)
+        self.listbox.selection_set(index)
+
+        try:
+            self.m.post(event.x_root, event.y_root)
+        finally:
+            self.m.grab_release()
+
+    def open_file(self, event=None):
+        # subprocess.Popen("explorer Z:/03_private/project/video_cutter/app")
+        selection = self.listbox.curselection()
+        item = self.listbox.get(selection).strip()
+        subprocess.run(["start", "", item], shell=True)
+
+    def open_folder(self, event=None):
+        selection = self.listbox.curselection()
+        item = self.listbox.get(selection).strip()
+        path = os.path.dirname(item)
+        # path = path.replace("/", "\\")
+        path = os.path.normpath(path)
+        print(path)
+        subprocess.run(["explorer", path], shell=True)
+
+    def delete_item(self, event=None):
+        selection = self.listbox.curselection()
+        # item = self.listbox.get(selection).strip()
+        self.listbox.delete(selection)
+
+    def edit_list(self, event=None):
+        log_filename = "exports.log"
+        current_dir = os.getcwd()
+        log_file_path = os.path.join(current_dir, log_filename)
+
+        subprocess.run(["start", "", log_file_path], shell=True)
 
 
 class ExportFrame(tk.Frame):
