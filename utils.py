@@ -1,12 +1,10 @@
-def duration_to_timecode(seconds):
-    """
-    Converts seconds (s) to timecode (hh:mm:ss)
-    """
-    hours = int(seconds / 60 / 60)  # timer.rest
-    hours_sec = hours * 3600  # totalt timer i sekunder
-    rest_sec = seconds - hours_sec  # resterende sekunder
-    minutes = int(rest_sec / 60)  # minutter.rest
-    minutes_sec = minutes * 60  # totalt minutter i sekunder
+def duration_to_timecode(seconds: int) -> str:
+    """Converts seconds (s) to timecode (hh:mm:ss)"""
+    hours = int(seconds / 60 / 60)
+    hours_sec = hours * 3600
+    rest_sec = seconds - hours_sec
+    minutes = int(rest_sec / 60)
+    minutes_sec = minutes * 60
     rest_sec = rest_sec - minutes_sec
     seconds = int(rest_sec)
 
@@ -23,7 +21,7 @@ def duration_to_timecode(seconds):
     return timecode
 
 
-def format_to_seconds(duration):
+def format_to_seconds(duration: str) -> int:
     # From: hh:mm:ss
     # To:   ss
     timecode = duration.split(":")
@@ -35,10 +33,8 @@ def format_to_seconds(duration):
     return total
 
 
-def timecode_to_seconds(start, end):
-    """
-    Converts timecode (hh:mm:ss) to seconds (s)
-    """
+def get_duration(start: str, end: str) -> int:
+    """Gets duration in seconds"""
     start = format_to_seconds(start)
     end = format_to_seconds(end)
     duration = end - start

@@ -1,0 +1,6 @@
+__pycache__/
+ffmpeg
+compiler.txt
+main.spec
+video.py
+main.exe

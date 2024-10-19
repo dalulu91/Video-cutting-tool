@@ -13,7 +13,8 @@ app = ui.Window()
 
 def loadfile(event=None):
     """Event: Open and select video file"""
-    file = ui.tk.filedialog.askopenfilename(title="Select a video", initialdir=".")
+    file = ui.tk.filedialog.askopenfilename(
+        title="Select a video", initialdir=".")
     if file:
         # Update filepath
         global filepath
@@ -34,10 +35,12 @@ def set_file_duration(filepath):
     duration = clip.duration
 
     app.sliderFrame.slider.configure(to=duration)
+    app.sliderFrame.max_duration = duration
 
     # setIn()
     app.timecodeFrame.outStamp.delete("0", tk.END)
-    app.timecodeFrame.outStamp.insert("0", utils.duration_to_timecode(duration))
+    app.timecodeFrame.outStamp.insert(
+        "0", utils.duration_to_timecode(duration))
 
     clip.close()
 
@@ -68,49 +71,27 @@ def setOut(event=None):
     )
 
 
-# path_to_filename() NOTE: Not necessary?
-"""
-Returns a filename from path
-(c:/dir/filename.mp4)
-"""
-
-# export()
-"""
-Event:
-Let's user choose a location and filename
-Returns perform_ffmpeg() and adds a "success"-label
-to the UI.
-"""
-
-
 def saveAs(event=None):
-    # source, start, duration in timecode
+    """
+    Event:
+    Let's user choose a location and filename
+    Returns perform_ffmpeg() and adds a "success"-label
+    to the UI.
+    """
     source = filepath
     start = app.timecodeFrame.inStamp.get()
     end = app.timecodeFrame.outStamp.get()
-    duration = utils.duration_to_timecode(utils.timecode_to_seconds(start, end))
+    duration = utils.duration_to_timecode(utils.get_duration(start, end))
 
     output = filedialog.asksaveasfilename()
     if output:
-        outputText = f"source: {source}\nstart: {
-            start}\nend: {end}\nduration: {duration}\noutput: {output}"
-
         perform_ffmpeg(source, start, duration, output)
         # tk.Label(root, text=outputText).pack()
 
-
-# perform_ffmpeg()
-"""
-Executes ffmpeg as shell command
-"""
+        # TODO: UI Feedback that operation was successful
 
 
-def perform_ffmpeg(source, start, duration, output=None):
-    # fileext = source.split(".")[:1]
-    # output = source + fileext
-    if not output:
-        output = "nytt_filnavn.mp4"
-
+def perform_ffmpeg(source, start, duration, output):
     shell_command = str(
         "ffmpeg -ss "
         + start
@@ -142,6 +123,7 @@ app.bind("<o>", setOut, add="+")
 app.exportFrame.exportBtn.bind("<Button-1>", saveAs)
 
 
+# Run main window
 def run():
     app.bind("<Escape>", lambda e: app.destroy())
     app.mainloop()
