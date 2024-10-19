@@ -1,6 +1,7 @@
 # Video Cutter
 A simple tool that lets you copy a specific timeframe from a video to a new file.
 There's no transcoding going on, so the export is instant.
+
 ![python_BoUzWb93oe](https://github.com/user-attachments/assets/fcfcdcc6-d146-4a51-a8d7-c19923f54000)
 
 Requirement: ffmpeg
